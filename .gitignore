@@ -8,3 +8,6 @@ venv/
 
 *.egg-info
 dist/
+
+.pytest_cache/
+.coverage

@@ -14,6 +14,7 @@ RUN pip install --upgrade pip \
     && pip install --upgrade setuptools \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY drf_custom_related_field .
+COPY tests .
 
 CMD ["sh"]
