@@ -1,11 +1,12 @@
 from django.test import TestCase
+
 from rest_framework.exceptions import ValidationError
 
-from .models import Employee, Company
-from .serializers import EmployeeSerializer
+from .models import Company, Employee
+from .serializers import EmployeeSerializer, EmployeeSerializerWithoutFieldNameSpecified
 
 
-class CustomeRelationTestCase(TestCase):
+class CustomRelationTestCase(TestCase):
     def setUp(self) -> None:
         self.company = Company.objects.create(name='Great Inc.', country='US')
         self.employee = Employee.objects.create(username='ckkz', company=self.company)
