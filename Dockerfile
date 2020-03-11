@@ -20,7 +20,7 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/* \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools \
-    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
