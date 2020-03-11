@@ -63,84 +63,99 @@ company = Company.objects.create(name='Great Inc.', country='US', )
 employee = Employee.objects.create(username='ckkz', company=company, workplace=workplace)
 ```
 
-Examples:
+Now we ready to use our field. To specify which field we want to map for relation,
+pass required `field_name` argument to the `CustomRelatedField`. It can be either
+`str` or simple callable (with no arguments) that returns `str`.
 
-1. Map custom field for read only
-    ```python
-    class EmployeeSerializer(serializers.ModelSerializer):
-       company = CustomRelatedField(queryset=Company.objects, field_name='name')
+For example:
 
-       class Meta:
-           model = Employee
-           fields = ('username', 'company')
+```python
+CustomRelatedField(field_name='name', read_only=True)
 
-    serializer = EmployeeSerializer(employee)
-    assert serializer.data['company'] == company.name
-    ```
-      ```json
-   {
-    "username": "ckkz",
-    "company": "Great Inc."
-   } 
-   ```
+def get_field_name():
+    return 'some_field'
+
+CustomRelatedField(field_name=get_field_name, read_only=True)
+```
+
+Usage examples:
+
+1. Map custom field for read only.
+```python
+class EmployeeSerializer(serializers.ModelSerializer):
+   company = CustomRelatedField(queryset=Company.objects, field_name='name')
+
+   class Meta:
+       model = Employee
+       fields = ('username', 'company')
+
+serializer = EmployeeSerializer(employee)
+assert serializer.data['company'] == company.name
+```
+  ```json
+{
+"username": "ckkz",
+"company": "Great Inc."
+} 
+```
 
 2. Assign new value by custom field (`name` in this case)
-    ```python
-    class EmployeeSerializer(serializers.ModelSerializer):
-       company = CustomRelatedField(queryset=Company.objects, field_name='name')
+```python
+class EmployeeSerializer(serializers.ModelSerializer):
+   company = CustomRelatedField(queryset=Company.objects, field_name='name')
 
-       class Meta:
-           model = Employee
-           fields = ('username', 'company')
-   
-    new_company = Company.objects.create(name='New Company', country='RU')
-    serializer = EmployeeSerializer(employee, data={'company': new_company.name}, partial=True)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    employee.refresh_from_db()
-    assert employee.company_id == new_company.id
-    ```   
-   ```json
-   {
-    "username": "ckkz",
-    "company": "New Company"
-   } 
-   ```
+   class Meta:
+       model = Employee
+       fields = ('username', 'company')
+
+new_company = Company.objects.create(name='New Company', country='RU')
+serializer = EmployeeSerializer(employee, data={'company': new_company.name}, partial=True)
+serializer.is_valid(raise_exception=True)
+serializer.save()
+employee.refresh_from_db()
+assert employee.company_id == new_company.id
+```   
+```json
+{
+"username": "ckkz",
+"company": "New Company"
+} 
+```
 
 3. Use `many=True`
-    ```python
-    class WorkingBuildingSerializer(serializers.ModelSerializer):
-       employees = CustomRelatedField(field_name='username', many=True, read_only=True)
+```python
+class WorkingBuildingSerializer(serializers.ModelSerializer):
+   employees = CustomRelatedField(field_name='username', many=True, read_only=True)
 
-       class Meta:
-           model = WorkingBuilding
-           fields = ('capacity', 'employees')
+   class Meta:
+       model = WorkingBuilding
+       fields = ('capacity', 'employees')
 
-    serializer = WorkingBuildingSerializer(workplace)
-    assert len(serializer.data['employees']) == workplace.employees.count()
-    ```
-   ```json
-    {
-     "capacity": 200,
-     "employees": ["ckkz"]
-    }
-    ```
+serializer = WorkingBuildingSerializer(workplace)
+assert len(serializer.data['employees']) == workplace.employees.count()
+```
+```json
+{
+ "capacity": 200,
+ "employees": ["ckkz"]
+}
+```
 
 4. Use nested (dotted) relations and callable model fields
-    ```python
-    class EmployeeSerializer(serializers.ModelSerializer):
-       workplace = CustomRelatedField(source='workplace.address', field_name='full_address', read_only=True)
+```python
+class EmployeeSerializer(serializers.ModelSerializer):
+   workplace = CustomRelatedField(source='workplace.address', field_name='full_address', read_only=True)
 
-       class Meta:
-           model = Employee
-           fields = ('username', 'workplace')
+   class Meta:
+       model = Employee
+       fields = ('username', 'workplace')
 
-   serializer = EmployeeSerializer(employee)
-   assert serializer.data['workplace'] == employee.workplace.address.full_address() 
-    ```
-   ```json
-    {
-     "username": "ckkz",
-     "workplace": "Main st., 10"
-    }
-    ```
+serializer = EmployeeSerializer(employee)
+assert serializer.data['workplace'] == employee.workplace.address.full_address() 
+```
+```json
+{
+ "username": "ckkz",
+ "workplace": "Main st., 10"
+}
+```
