@@ -10,11 +10,18 @@ WORKDIR /opt/app
 
 COPY requirements.txt .
 
-RUN pip install --upgrade pip \
+RUN apk add --no-cache \
+        gcc \
+        musl-dev \
+        linux-headers \
+        libffi-dev \
+        openssl-dev \
+        python3-dev \
+    && rm -rf /var/cache/apk/* \
+    && pip install --upgrade pip \
     && pip install --upgrade setuptools \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt \
 
-COPY drf_custom_related_field .
-COPY tests .
+COPY . .
 
 CMD ["sh"]
