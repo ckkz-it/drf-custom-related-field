@@ -14,7 +14,7 @@ setup(
     author_email='cirkus.kz@gmail.com',
     py_modules=['drf_custom_related_field'],
     description=(
-        'Writable nested helpers for django-rest-framework\'s serializers'),
+        'Custom relation field for django-rest-framework\'s serializers'),
     long_description=long_description,
     long_description_content_type='text/markdown',
     keywords=('drf restframework rest_framework django_rest_framework'
